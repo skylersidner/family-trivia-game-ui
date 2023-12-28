@@ -4,7 +4,7 @@ export const baseURL =
   // @ts-ignore
   process.env.NODE_ENV === "development"
     ? "http://localhost:3003"
-    : "https://emerald-server-nk73.onrender.com/";
+    : "https://family-trivia-api.onrender.com/";
 const instance = axios.create({
   baseURL,
   withCredentials: true,
