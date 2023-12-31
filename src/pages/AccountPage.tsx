@@ -1,14 +1,10 @@
 import {
   Box,
   Button,
-  Checkbox,
-  Flex,
   FormControl,
-  FormHelperText,
   FormLabel,
   Input,
   InputGroup,
-  InputLeftAddon,
   InputLeftElement,
   Text,
   useToast,
@@ -20,14 +16,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "../utils/axios";
 import { BsPerson } from "react-icons/bs";
 import { MdOutlineEmail, MdOutlineVpnKey } from "react-icons/md";
-import { GiNuclearBomb } from "react-icons/gi";
-import { Select } from "chakra-react-select";
-import MESSAGE_OPTIONS, {
-  getMessageOptionFromValue,
-} from "../utils/message.options";
-import DELIVERY_TIME_OPTIONS, {
-  getDeliveryTimeOptionFromValue,
-} from "../utils/delivery.time.options";
 
 const AccountPage = () => {
   let navigate = useNavigate();
@@ -39,32 +27,19 @@ const AccountPage = () => {
   }, [user]);
   const toast = useToast();
   const [fullName, setFullName] = useState(user?.fullName);
-  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber);
   const [email, setEmail] = useState(user?.email);
   const [password, setPassword] = useState("");
-  const [messageOption, setMessageOption] = useState(
-    getMessageOptionFromValue(user?.messageTypes[0]) ||
-      MESSAGE_OPTIONS.SELF_AFFIRMATIONS
-  );
-  const [useSwearWords, setUseSwearWords] = useState(user.useSwearWords);
-  const [deliveryTimeOption, setDeliveryTimeOption] = useState(
-    getDeliveryTimeOptionFromValue(user?.deliveryTimeOptions) ||
-      DELIVERY_TIME_OPTIONS.MORNING
-  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   function handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     setIsSubmitting(true);
+    if(!user) return;
     axios
-      .post(`/api/account/update/${user._id}`, {
+      .post(`/api/accounts/update/${user._id}`, {
         fullName,
         email,
-        phoneNumber,
-        messageTypes: [messageOption.value],
-        deliveryTime: deliveryTimeOption.value,
         password,
-        useSwearWords,
       })
       .then(({ data }) => {
         setIsSubmitting(false);
@@ -147,52 +122,6 @@ const AccountPage = () => {
           </InputGroup>
         </FormControl>
 
-        <FormControl isRequired>
-          <FormLabel>Phone Number (US Only)</FormLabel>
-          <InputGroup>
-            <InputLeftAddon children="+1" />
-            <Input
-              value={phoneNumber}
-              type="phone"
-              name="phone"
-              placeholder="Your Phone Number"
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-          </InputGroup>
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel>Kind of Message</FormLabel>
-          <Select
-            name="message-type"
-            options={Object.values(MESSAGE_OPTIONS)}
-            value={messageOption}
-            closeMenuOnSelect={true}
-            onChange={(option) => setMessageOption(option!)}
-          />
-        </FormControl>
-        {messageOption.value === MESSAGE_OPTIONS.HYPE.value && (
-          <FormControl isRequired>
-            <FormLabel>Include F Bomb</FormLabel>
-            <Checkbox
-              size="lg"
-              colorScheme="red"
-              icon={<GiNuclearBomb />}
-              name="use-swear-words"
-              isChecked={useSwearWords}
-              onChange={(e) => setUseSwearWords(e.target.checked)}
-            />
-          </FormControl>
-        )}
-        <FormControl isRequired>
-          <FormLabel>Delivery Time</FormLabel>
-          <Select
-            name="delivery-time"
-            options={Object.values(DELIVERY_TIME_OPTIONS)}
-            value={deliveryTimeOption}
-            closeMenuOnSelect={true}
-            onChange={(option) => setDeliveryTimeOption(option!)}
-          />
-        </FormControl>
         <Button
           colorScheme="blue"
           bg="blue.400"
@@ -201,7 +130,7 @@ const AccountPage = () => {
             bg: "blue.500",
           }}
           isLoading={isSubmitting}
-          disabled={!phoneNumber || !fullName || !email}
+          disabled={!fullName || !email}
           onClick={(event) => handleSubmit(event)}
         >
           Update Account

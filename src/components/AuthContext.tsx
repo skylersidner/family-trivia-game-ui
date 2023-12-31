@@ -1,9 +1,24 @@
 import React from "react";
-
+import { jwtDecode } from "jwt-decode";
 import { authenticationService } from "../utils/auth";
 
+export interface IUser {
+  deliveryTimeOptions: any;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  role: string;
+  _id: string;
+  useSwearWords: boolean;
+  fullName: string;
+  messageTypes: string[];
+  pricingTier: string;
+  billingPeriod: string;
+}
+
 interface AuthContextType {
-  user: any;
+  user: IUser | null;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: (callback: VoidFunction) => void;
   updateUser: (user: any) => void;
@@ -14,37 +29,36 @@ function useAuth() {
 }
 
 const AuthContext = React.createContext<AuthContextType>(null!);
+
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const storedUser = localStorage.getItem("user");
+  const storedUser = sessionStorage.getItem("user");
   let [user, setUser] = React.useState<any>(
-    storedUser ? JSON.parse(storedUser) : null
+      storedUser ? JSON.parse(storedUser) : null
   );
 
-  const signIn = (email: string, password: string) => {
-    return authenticationService.signIn(email, password).then((user: any) => {
-      localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
-    });
+  const signIn = async (email: string, password: string) => {
+    const { token } = await authenticationService.signIn(email, password);
+    const user = jwtDecode(token);
+    sessionStorage.setItem("user", JSON.stringify(user));
+    sessionStorage.setItem("token", token);
+    setUser(user);
   };
 
-  const signOut = (callback: VoidFunction) => {
-    return authenticationService.signOut().then(() => {
-      localStorage.removeItem("user");
-      setUser(null);
-    });
+  const signOut = async () => {
+    await authenticationService.signOut();
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    setUser(null);
   };
   const updateUser = (user: any) => {
-    localStorage.setItem("user", JSON.stringify(user));
+    sessionStorage.setItem("user", JSON.stringify(user));
     setUser(user);
   };
 
   let value = { user, signIn, signOut, updateUser };
-  let test = (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export default AuthProvider;
 
-export { useAuth };
+export {useAuth};

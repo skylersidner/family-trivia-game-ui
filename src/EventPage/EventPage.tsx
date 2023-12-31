@@ -1,14 +1,10 @@
 import {
   Avatar,
   Box,
-  Button,
-  Divider,
   Flex,
-  Input,
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import classNames from "classnames";
 import "./EventPage.css";
 import { io } from "socket.io-client";
 import { baseURL } from "../utils/axios";
