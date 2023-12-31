@@ -43,7 +43,7 @@ export default function Hero() {
                 zIndex: -1,
               }}
             >
-              Emerald,
+              Trivia,
             </Text>
             <br />
             <Text
@@ -51,12 +51,9 @@ export default function Hero() {
               as={"span"}
               color={"blue.400"}
             >
-              sports updates on demand.
+               on demand.
             </Text>
           </Heading>
-          <Text fontSize={20} color={"gray.500"}>
-            Emerald is a sports news app that allows you to get the latest news on your favorite teams and players.
-          </Text>
           <Stack
             spacing={{ base: 4, sm: 6 }}
             direction={{ base: "column", sm: "row" }}

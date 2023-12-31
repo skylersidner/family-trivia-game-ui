@@ -26,12 +26,8 @@ import MESSAGE_OPTIONS from "./utils/message.options";
 export default function ContactFormWithSocialButtons() {
   const { hasCopied, onCopy } = useClipboard("example@example.com");
   const [fullName, setFullName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [messageOption, setMessageOption] = useState(
-    MESSAGE_OPTIONS.SELF_AFFIRMATIONS
-  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successfullySignedUp, setSuccessfullySignedUp] = useState(false);
   const toast = useToast();
@@ -116,19 +112,6 @@ export default function ContactFormWithSocialButtons() {
                     </InputGroup>
                   </FormControl>
 
-                  <FormControl isRequired>
-                    <FormLabel>Phone Number (US Only)</FormLabel>
-                    <InputGroup>
-                      <InputLeftAddon children="+1" />
-                      <Input
-                        value={phoneNumber}
-                        type="phone"
-                        name="phone"
-                        placeholder="Your Phone Number"
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                      />
-                    </InputGroup>
-                  </FormControl>
                   <Button
                     colorScheme="blue"
                     bg="blue.400"
@@ -137,15 +120,13 @@ export default function ContactFormWithSocialButtons() {
                       bg: "blue.500",
                     }}
                     isLoading={isSubmitting}
-                    disabled={!phoneNumber || !fullName || !email}
+                    disabled={!fullName || !email}
                     onClick={() => {
                       setIsSubmitting(true);
                       axios
                         .post("/api/accounts/create", {
-                          phoneNumber,
                           fullName,
                           email,
-                          messageTypes: [messageOption.value],
                           password,
                         })
                         .then((response) => {

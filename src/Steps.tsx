@@ -53,23 +53,23 @@ export default function SimpleThreeColumns() {
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
           <Feature
             icon={<Icon as={FcPhone} w={10} h={10} />}
-            title={"Parent, Coaches, or Journalists can create events"}
+            title={"Create a game"}
             text={
-              "The enthusiastic parent, coach, or journalist can create an event and invite others to join."
+              "Create a trivia game and invite your friends to join."
             }
           />
           <Feature
             icon={<Icon as={FcDonate} w={10} h={10} />}
-            title={"Anyone can join an event"}
+            title={"Create as many games as you want"}
             text={
-              "Its as easy as clicking a link. No need to download an app or create an account."
+              "Create as many games as you want and play with as many friends as you want."
             }
           />
           <Feature
             icon={<Icon as={FcEndCall} w={10} h={10} />}
             title={"Real-time updates"}
             text={
-              "Event owners can provide real-time updates to all participants."
+              "Creators can update the score in real-time and all players will see the updates."
             }
           />
         </SimpleGrid>

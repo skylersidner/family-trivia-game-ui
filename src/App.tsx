@@ -26,31 +26,9 @@ import EventPage from "./EventPage/EventPage";
 import EventListPage from "./EventListPage/EventListPage";
 import EventManagePage from "./EventManagePage/EventManagePage";
 
-function AuthStatus() {
-  let auth = useAuth();
-  let navigate = useNavigate();
-
-  if (!auth.user) {
-    return <p>You are not logged in.</p>;
-  }
-
-  return (
-    <p>
-      Welcome {auth.user}!{" "}
-      <button
-        onClick={() => {
-          auth.signOut(() => navigate("/"));
-        }}
-      >
-        Sign out
-      </button>
-    </p>
-  );
-}
-
 function Layout() {
   return (
-    <Flex direction={"column"} w={"100vw"} h={"100vh"}>
+    <Flex direction={"column"}>
       <Banner />
       <Outlet />
     </Flex>
@@ -116,8 +94,6 @@ function LoginPage() {
   return (
     <Box
       as={"div"}
-      w={"100vw"}
-      h={"100vh"}
       justifyContent={"center"}
       alignItems={"center"}
       display={"flex"}
