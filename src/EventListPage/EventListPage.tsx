@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import "./EventListPage.css";
 import { getPublicEvents, createEvent } from "../api/events";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+import { baseURL } from "../utils/axios";
+const socket = io(baseURL);
 
 const EventListPage = () => {
   const [events, setEvents] = useState<any>([]);
@@ -14,6 +17,9 @@ const EventListPage = () => {
     });
   }, []);
   const navigate = useNavigate();
+  useEffect(() => {
+    socket.emit("join-game", "test");
+  }, []);
   return (
     <Flex
       direction={"column"}
@@ -22,6 +28,7 @@ const EventListPage = () => {
       alignItems={"center"}
       p={3}
     >
+      <Button onClick={()=> socket.emit("join-game", "levi")}>Join Game</Button>
       {!events.length && (
         <Flex flex={1} justifyContent={"center"} alignItems={"center"}>
           No events found
