@@ -1,9 +1,9 @@
 import { Avatar, Button, Divider, Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import classNames from "classnames";
-import "./EventManagePage.css";
+import "./GameManagePage.css";
 
-const EventManagePage = () => {
+const GameManagePage = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<number | undefined>(
     undefined
   );
@@ -111,4 +111,4 @@ const EventManagePage = () => {
     </Flex>
   );
 };
-export default EventManagePage;
+export default GameManagePage;

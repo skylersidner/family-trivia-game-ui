@@ -42,7 +42,7 @@ const Banner = () => {
       <Flex pr={"20px"} alignItems={"center"}>
         <Button
           onClick={() => {
-            navigate("/events");
+            navigate("/games");
           }}
           mr={3}
         >

@@ -4,7 +4,7 @@ import {
   Flex,
   Text,
 } from "@chakra-ui/react";
-import "./EventPage.css";
+import "./GamePage.css";
 
 const ScoreBoard = () => {
 
@@ -42,7 +42,7 @@ const ScoreBoard = () => {
     </Flex>
   );
 };
-const EventPage = () => {
+const GamePage = () => {
   return (
     <Flex direction={"column"} flex={1} height={"100%"}>
       <Flex direction={"column"} overflow={"scroll"}>
@@ -51,4 +51,4 @@ const EventPage = () => {
     </Flex>
   );
 };
-export default EventPage;
+export default GamePage;

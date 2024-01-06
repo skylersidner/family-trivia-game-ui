@@ -22,9 +22,9 @@ import {
 } from "@chakra-ui/react";
 import AuthProvider, { useAuth } from "./components/AuthContext";
 import AccountPage from "./pages/AccountPage";
-import EventPage from "./EventPage/EventPage";
-import EventListPage from "./EventListPage/EventListPage";
-import EventManagePage from "./EventManagePage/EventManagePage";
+import GamePage from "./GamePage/GamePage";
+import GameListPage from "./GameListPage/GameListPage";
+import GameManagePage from "./GameManagePage/GameManagePage";
 
 function Layout() {
   return (
@@ -141,9 +141,9 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/account" element={<AccountPage />} />
-          <Route path="/events" element={<EventListPage />} />
-          <Route path="/event/:eventId" element={<EventPage />} />
-          <Route path="/event/manage/:eventId" element={<EventManagePage />} />
+          <Route path="/games" element={<GameListPage />} />
+          <Route path="/game/:gameId" element={<GamePage />} />
+          <Route path="/game/manage/:gameId" element={<GameManagePage />} />
         </Route>
       </Routes>
     </AuthProvider>

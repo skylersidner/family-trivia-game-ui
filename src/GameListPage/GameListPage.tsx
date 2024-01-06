@@ -1,18 +1,18 @@
 import { Button, Flex, Input } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import "./EventListPage.css";
-import { getPublicEvents, createEvent } from "../api/events";
+import "./GameListPage.css";
+import { getPublicGames, createGame } from "../api/games";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { baseURL } from "../utils/axios";
 const socket = io(baseURL);
 
-const EventListPage = () => {
+const GameListPage = () => {
   const [events, setEvents] = useState<any>([]);
   const [eventTitle, setEventTitle] = useState<string>("");
   const [search, setSearch] = useState<string>("");
   useEffect(() => {
-    getPublicEvents().then(({ data }) => {
+    getPublicGames().then(({ data }) => {
       setEvents(data);
     });
   }, []);
@@ -47,8 +47,8 @@ const EventListPage = () => {
           px={8}
           mr={3}
           onClick={() => {
-            createEvent({
-              title: "Test Event",
+            createGame({
+              title: eventTitle,
             }).then(({ data }) => {
               setEvents([...events, data]);
             });
@@ -62,7 +62,7 @@ const EventListPage = () => {
         />
       </Flex>
       {events
-        .filter((event: any) => !search || event.title.includes(search))
+        .filter((event: any) => !search || event.title.toLowerCase().includes(search?.toLowerCase()))
         .map((event: any) => {
           return (
             <Flex
@@ -83,12 +83,12 @@ const EventListPage = () => {
                 </Flex>
               </Flex>
               <Flex>
-                <Button onClick={() => navigate(`/event/${event._id}`)}>
+                <Button onClick={() => navigate(`/game/${event._id}`)}>
                   View
                 </Button>
                 <Button
                   ml={2}
-                  onClick={() => navigate(`/event/manage/${event._id}`)}
+                  onClick={() => navigate(`/game/manage/${event._id}`)}
                 >
                   Manage
                 </Button>
@@ -99,4 +99,4 @@ const EventListPage = () => {
     </Flex>
   );
 };
-export default EventListPage;
+export default GameListPage;
