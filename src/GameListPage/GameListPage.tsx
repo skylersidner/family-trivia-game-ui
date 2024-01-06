@@ -5,15 +5,17 @@ import { getPublicGames, createGame } from "../api/games";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { baseURL } from "../utils/axios";
+import {useAuth} from "../components/AuthContext";
 const socket = io(baseURL);
 
 const GameListPage = () => {
-  const [events, setEvents] = useState<any>([]);
-  const [eventTitle, setEventTitle] = useState<string>("");
+  const {user} = useAuth();
+  const [games, setGames] = useState<any>([]);
+  const [gameTitle, setGameTitle] = useState<string>("");
   const [search, setSearch] = useState<string>("");
   useEffect(() => {
     getPublicGames().then(({ data }) => {
-      setEvents(data);
+      setGames(data);
     });
   }, []);
   const navigate = useNavigate();
@@ -28,12 +30,6 @@ const GameListPage = () => {
       alignItems={"center"}
       p={3}
     >
-      <Button onClick={()=> socket.emit("join-game", "levi")}>Join Game</Button>
-      {!events.length && (
-        <Flex flex={1} justifyContent={"center"} alignItems={"center"}>
-          No events found
-        </Flex>
-      )}
       <Input
         placeholder={"Search"}
         mb={3}
@@ -41,32 +37,37 @@ const GameListPage = () => {
         bg={"white"}
         onChange={(e) => setSearch(e.target.value)}
       />
+      {!games.length && (
+          <Flex flex={1} justifyContent={"center"} alignItems={"center"}>
+            No Games found
+          </Flex>
+      )}
       <Flex mb={3}>
         <Button
-          disabled={!eventTitle}
+          disabled={!gameTitle}
           px={8}
           mr={3}
           onClick={() => {
             createGame({
-              title: eventTitle,
+              title: gameTitle,
             }).then(({ data }) => {
-              setEvents([...events, data]);
+              setGames([...games, data]);
             });
           }}
         >
-          Create Event
+          Create Game
         </Button>
         <Input
           placeholder={"Title"}
-          onChange={(e) => setEventTitle(e.target.value)}
+          onChange={(e) => setGameTitle(e.target.value)}
         />
       </Flex>
-      {events
-        .filter((event: any) => !search || event.title.toLowerCase().includes(search?.toLowerCase()))
-        .map((event: any) => {
+      {games
+        .filter((games: any) => !search || games.title.toLowerCase().includes(search?.toLowerCase()))
+        .map((game: any) => {
           return (
             <Flex
-              key={event._id}
+              key={game._id}
               maxW={800}
               w={"100%"}
               border={"2px solid #E2E8F0"}
@@ -75,24 +76,28 @@ const GameListPage = () => {
               p={3}
               mb={3}
               backgroundColor={"white"}
+              onClick={()=>navigate(`/game/${game._id}`)}
+              cursor={"pointer"}
+              _hover={{borderColor: "blue.400"}}
+              transition={"all 0.2s ease-in-out"}
             >
               <Flex flex={1} alignItems={"center"}>
                 <Flex direction={"column"} ml={2}>
-                  <Flex>{event.title}</Flex>
-                  <Flex>{event.createdBy?.fullName}</Flex>
+                  <Flex>{game.title}</Flex>
+                  <Flex>{game.createdBy?.fullName}</Flex>
                 </Flex>
               </Flex>
-              <Flex>
-                <Button onClick={() => navigate(`/game/${event._id}`)}>
-                  View
-                </Button>
+              {game.createdBy._id === user?._id && <Flex>
                 <Button
                   ml={2}
-                  onClick={() => navigate(`/game/manage/${event._id}`)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    navigate(`/game/manage/${game._id}`)
+                  }}
                 >
                   Manage
                 </Button>
-              </Flex>
+              </Flex>}
             </Flex>
           );
         })}

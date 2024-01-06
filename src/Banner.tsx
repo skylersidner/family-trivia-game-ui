@@ -46,7 +46,7 @@ const Banner = () => {
           }}
           mr={3}
         >
-          Events
+          Games
         </Button>
         {!!auth.user && (
           <Popover>
