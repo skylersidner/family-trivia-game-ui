@@ -1,5 +1,11 @@
-const formatDate = (date: Date): string =>
-  date.toLocaleDateString("en-US", {
+const formatDate = (date: Date | string): string => {
+  let localDate;
+  if (typeof date === "string") {
+    localDate = new Date(date);
+  } else {
+    localDate = date;
+  }
+  return localDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -7,5 +13,6 @@ const formatDate = (date: Date): string =>
     minute: "numeric",
     hour12: true,
   });
+};
 
 export default formatDate;

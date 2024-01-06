@@ -5,11 +5,12 @@ import { getPublicGames, createGame } from "../api/games";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { baseURL } from "../utils/axios";
-import {useAuth} from "../components/AuthContext";
+import { useAuth } from "../components/AuthContext";
+import formatDate from "../utils/dates";
 const socket = io(baseURL);
 
 const GameListPage = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [games, setGames] = useState<any>([]);
   const [gameTitle, setGameTitle] = useState<string>("");
   const [search, setSearch] = useState<string>("");
@@ -38,9 +39,9 @@ const GameListPage = () => {
         onChange={(e) => setSearch(e.target.value)}
       />
       {!games.length && (
-          <Flex flex={1} justifyContent={"center"} alignItems={"center"}>
-            No Games found
-          </Flex>
+        <Flex flex={1} justifyContent={"center"} alignItems={"center"}>
+          No Games found
+        </Flex>
       )}
       <Flex mb={3}>
         <Button
@@ -63,7 +64,10 @@ const GameListPage = () => {
         />
       </Flex>
       {games
-        .filter((games: any) => !search || games.title.toLowerCase().includes(search?.toLowerCase()))
+        .filter(
+          (games: any) =>
+            !search || games.title.toLowerCase().includes(search?.toLowerCase())
+        )
         .map((game: any) => {
           return (
             <Flex
@@ -76,28 +80,36 @@ const GameListPage = () => {
               p={3}
               mb={3}
               backgroundColor={"white"}
-              onClick={()=>navigate(`/game/${game._id}`)}
+              onClick={() => navigate(`/game/${game._id}`)}
               cursor={"pointer"}
-              _hover={{borderColor: "blue.400"}}
+              _hover={{ borderColor: "blue.400" }}
               transition={"all 0.2s ease-in-out"}
             >
               <Flex flex={1} alignItems={"center"}>
-                <Flex direction={"column"} ml={2}>
-                  <Flex>{game.title}</Flex>
-                  <Flex>{game.createdBy?.fullName}</Flex>
+                <Flex direction={"column"} ml={2} alignSelf={"start"}>
+                  <Flex>Title: {game.title}</Flex>
+                  <Flex>Created By: {game.createdBy?.fullName}</Flex>
+                  <Flex>Created At: {formatDate(game.createdAt)}</Flex>
+                  <Flex>Starts At: {formatDate(game.startDate)}</Flex>
+                </Flex>
+                <Flex direction={"column"} ml={2} alignSelf={"start"}>
+                  <Flex>Questions: {game.questions?.length}</Flex>
+                  <Flex>Player Count: {game.currentPlayerCount}</Flex>
                 </Flex>
               </Flex>
-              {game.createdBy._id === user?._id && <Flex>
-                <Button
-                  ml={2}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    navigate(`/game/manage/${game._id}`)
-                  }}
-                >
-                  Manage
-                </Button>
-              </Flex>}
+              {game.createdBy._id === user?._id && (
+                <Flex>
+                  <Button
+                    ml={2}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      navigate(`/game/manage/${game._id}`);
+                    }}
+                  >
+                    Manage
+                  </Button>
+                </Flex>
+              )}
             </Flex>
           );
         })}
