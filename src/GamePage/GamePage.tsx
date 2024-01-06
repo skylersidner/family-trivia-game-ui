@@ -1,13 +1,11 @@
-import {
-  Avatar,
-  Box, Button,
-  Flex,
-  Text,
-} from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Avatar, Box, Button, Flex, Text } from "@chakra-ui/react";
+import { getGameById } from "../api/games";
 import "./GamePage.css";
+import { useParams } from "react-router-dom";
+import formatDate from "../utils/dates";
 
 const ScoreBoard = () => {
-
   return (
     <Flex
       justifyContent={"space-around"}
@@ -43,10 +41,28 @@ const ScoreBoard = () => {
   );
 };
 const GamePage = () => {
+  const [game, setGame] = useState<any>(null);
+  const { gameId } = useParams();
+  useEffect(() => {
+    if (!gameId) return;
+    getGameById({ gameId }).then(({ data }) => {
+      setGame(data);
+    });
+  }, []);
+  const startDate = new Date(game?.startDate);
   return (
-    <Flex direction={"column"} flex={1} height={"100%"}>
-      <Flex direction={"column"} overflow={"scroll"}>
-        <Button>Do something useful</Button>
+    <Flex direction={"column"}>
+      <ScoreBoard />
+      <Flex direction={"column"}>
+        <Text>Title: {game?.title}</Text>
+        <Text>Starts: {formatDate(startDate)}</Text>
+        <Text>Current Players: {game?.currentPlayerCount}</Text>
+        <Box>Questions</Box>
+        {game?.questions.map((question: any) => (
+          <Box key={question.id} mb={3}>
+            <Text>{question.text}</Text>
+          </Box>
+        ))}
       </Flex>
     </Flex>
   );

@@ -24,6 +24,10 @@ export const updateGame = (gameId: string, eventUpdate: IGameUpdate) => {
 
 export const createGame = (newEvent: IGameCreate) => {
   return axios.post(`/api/games/create`, newEvent);
+}
+
+export const getGameById = ({gameId}:{gameId: string}) => {
+  return axios.get(`/api/games/${gameId}`);
 };
 
 export const getPublicGames = () => {
