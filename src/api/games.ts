@@ -19,7 +19,7 @@ interface IGameCreate {
 }
 
 export const updateGame = (gameId: string, eventUpdate: IGameUpdate) => {
-  return axios.post(`/api/games/${gameId}/update`, eventUpdate);
+  return axios.patch(`/api/games/${gameId}`, eventUpdate);
 };
 
 export const createGame = (newEvent: IGameCreate) => {

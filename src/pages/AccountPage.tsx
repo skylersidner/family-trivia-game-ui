@@ -36,7 +36,7 @@ const AccountPage = () => {
     setIsSubmitting(true);
     if(!user) return;
     axios
-      .post(`/api/accounts/update/${user._id}`, {
+      .patch(`/api/accounts/${user._id}`, {
         fullName,
         email,
         password,
