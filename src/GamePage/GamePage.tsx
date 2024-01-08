@@ -31,6 +31,7 @@ const Question = ({ question }: { question: any }) => {
           <Flex
             key={answer._id}
             onClick={() => setSelectedAnswerId(answer._id)}
+            cursor={"pointer"}
           >
             <Text>
               {`${index + 1}: ${answer.text}`}
