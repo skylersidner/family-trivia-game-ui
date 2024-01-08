@@ -24,7 +24,7 @@ const ScoreBoard = ({ players }: { players: any[] }) => {
 const Question = ({ question }: { question: any }) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string>("");
   return (
-    <Box mb={10}>
+    <Flex mb={10} mx={3} flexDirection={"column"}>
       <Text>{question.text}</Text>
       {question?.answers.map((answer: any, index: number) => {
         return (
@@ -41,6 +41,10 @@ const Question = ({ question }: { question: any }) => {
         );
       })}
       <Button
+        alignSelf={"center"}
+        width={"100%"}
+        maxW={"400px"}
+        textAlign={"center"}
         onClick={() => {
           GamesAPI.submitAnswer({
             questionId: question._id,
@@ -51,7 +55,7 @@ const Question = ({ question }: { question: any }) => {
       >
         Submit
       </Button>
-    </Box>
+    </Flex>
   );
 };
 const GamePage = () => {
@@ -67,9 +71,9 @@ const GamePage = () => {
   if (!game) return null;
   const startDate = new Date(game?.startDate);
   return (
-    <Flex direction={"column"}>
+    <Flex direction={"column"} alignItems={"center"}>
       <ScoreBoard players={game?.players || []} />
-      <Flex direction={"column"}>
+      <Flex direction={"column"} maxW={"800px"}>
         <Text>Title: {game?.title}</Text>
         <Text>Starts: {formatDate(startDate)}</Text>
         <Text mb={5}>Current Players: {game?.currentPlayerCount}</Text>
