@@ -1,6 +1,6 @@
-import { Component, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, Box, Button, Divider, Flex, Text } from "@chakra-ui/react";
-import GamesAPI from "../api/games";
+import Games from "../api/games";
 import "./GamePage.css";
 import { useParams } from "react-router-dom";
 import formatDate from "../utils/dates";
@@ -67,7 +67,7 @@ const Question = ({
         maxW={"400px"}
         textAlign={"center"}
         onClick={() => {
-          GamesAPI.submitAnswer({
+          Games.submitAnswer({
             questionId: question._id,
             gameId: game._id,
             answerId: selectedAnswerId,
@@ -87,7 +87,7 @@ const GamePage = () => {
   const { gameId } = useParams();
   useEffect(() => {
     if (!gameId) return;
-    GamesAPI.getGameById({ gameId }).then(({ data }) => {
+    Games.getGameById({ gameId }).then(({ data }) => {
       setGame(data);
     });
   }, []);
@@ -98,9 +98,11 @@ const GamePage = () => {
     <Flex direction={"column"} alignItems={"center"}>
       <ScoreBoard players={game?.players || []} />
       <Flex direction={"column"} maxW={"800px"}>
-        <Text>Title: {game?.title}</Text>
-        <Text>Starts: {formatDate(startDate)}</Text>
-        <Text mb={5}>Current Players: {game?.currentPlayerCount}</Text>
+        <Box mx={3}>
+          <Text>Title: {game?.title}</Text>
+          <Text>Starts: {formatDate(startDate)}</Text>
+          <Text mb={5}>Current Players: {game?.currentPlayerCount}</Text>
+        </Box>
         <Divider height={"4px"} backgroundColor={"blue.400"} />
         <Box fontSize={"xl"} textAlign={"center"}>
           Questions
