@@ -37,7 +37,7 @@ const Question = ({
   const [answerSubmitted, setAnswerSubmitted] = useState<boolean>(false);
   useEffect(() => {
     const currentAnswer = question?.answers.find((answer: any) =>
-      answer.selectedBy?.includes(user._id)
+      answer.selectedBy?.map((user: any) => user._id).includes(user._id)
     );
     if (!currentAnswer) return;
     setSelectedAnswerId(currentAnswer?._id);
