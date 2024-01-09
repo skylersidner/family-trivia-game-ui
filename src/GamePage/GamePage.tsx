@@ -4,6 +4,7 @@ import GamesAPI from "../api/games";
 import "./GamePage.css";
 import { useParams } from "react-router-dom";
 import formatDate from "../utils/dates";
+import { useAuth } from "../components/AuthContext";
 
 const ScoreBoard = ({ players }: { players: any[] }) => {
   return (
@@ -21,8 +22,27 @@ const ScoreBoard = ({ players }: { players: any[] }) => {
   );
 };
 
-const Question = ({ question }: { question: any }) => {
+const Question = ({
+  question,
+  game,
+  user,
+  setGame,
+}: {
+  question: any;
+  game: any;
+  user: any;
+  setGame: any;
+}) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string>("");
+  const [answerSubmitted, setAnswerSubmitted] = useState<boolean>(false);
+  useEffect(() => {
+    const currentAnswer = question?.answers.find((answer: any) =>
+      answer.selectedBy?.includes(user._id)
+    );
+    if (!currentAnswer) return;
+    setSelectedAnswerId(currentAnswer?._id);
+    setAnswerSubmitted(true);
+  }, [question]);
   return (
     <Flex mb={10} mx={3} flexDirection={"column"}>
       <Text>{question.text}</Text>
@@ -43,22 +63,26 @@ const Question = ({ question }: { question: any }) => {
       <Button
         alignSelf={"center"}
         width={"100%"}
+        disabled={!selectedAnswerId}
         maxW={"400px"}
         textAlign={"center"}
         onClick={() => {
           GamesAPI.submitAnswer({
             questionId: question._id,
-            gameId: question._id,
+            gameId: game._id,
             answerId: selectedAnswerId,
+          }).then(({ data }) => {
+            setGame(data);
           });
         }}
       >
-        Submit
+        {answerSubmitted ? "Update Answer" : "Submit Answer"}
       </Button>
     </Flex>
   );
 };
 const GamePage = () => {
+  const { user } = useAuth();
   const [game, setGame] = useState<any>(null);
   const { gameId } = useParams();
   useEffect(() => {
@@ -82,7 +106,13 @@ const GamePage = () => {
           Questions
         </Box>
         {game?.questions.map((question: any) => (
-          <Question key={question.id} question={question} />
+          <Question
+            key={question.id}
+            question={question}
+            game={game}
+            user={user}
+            setGame={setGame}
+          />
         ))}
       </Flex>
     </Flex>

@@ -1,4 +1,4 @@
-import { Button, Flex, Input } from "@chakra-ui/react";
+import { Button, Flex, Input, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "./GameListPage.css";
 import { getPublicGames, createGame } from "../api/games";
@@ -10,6 +10,7 @@ import formatDate from "../utils/dates";
 const socket = io(baseURL);
 
 const GameListPage = () => {
+  const toast = useToast();
   const { user } = useAuth();
   const [games, setGames] = useState<any>([]);
   const [gameTitle, setGameTitle] = useState<string>("");
@@ -80,7 +81,19 @@ const GameListPage = () => {
               p={3}
               mb={3}
               backgroundColor={"white"}
-              onClick={() => navigate(`/game/${game._id}`)}
+              onClick={() => {
+                if (user) {
+                  navigate(`/game/${game._id}`);
+                } else {
+                  toast({
+                    title: "You must be logged in to join a game.",
+                    status: "error",
+                    duration: 9000,
+                    isClosable: true,
+                    position: "top",
+                  });
+                }
+              }}
               cursor={"pointer"}
               _hover={{ borderColor: "blue.400" }}
               transition={"all 0.2s ease-in-out"}
