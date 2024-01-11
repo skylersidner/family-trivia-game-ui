@@ -1,4 +1,4 @@
-import { Button, Flex, Input, useToast } from "@chakra-ui/react";
+import { Button, Flex, Input, Text, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "./GameListPage.css";
 import { getPublicGames, createGame } from "../api/games";
@@ -45,24 +45,29 @@ const GameListPage = () => {
         </Flex>
       )}
       <Flex mb={3}>
-        <Button
-          disabled={!gameTitle}
-          px={8}
-          mr={3}
-          onClick={() => {
-            createGame({
-              title: gameTitle,
-            }).then(({ data }) => {
-              setGames([...games, data]);
-            });
-          }}
-        >
-          Create Game
-        </Button>
-        <Input
-          placeholder={"Title"}
-          onChange={(e) => setGameTitle(e.target.value)}
-        />
+        {user && (
+          <>
+            <Button
+              disabled={!gameTitle || !user}
+              px={8}
+              mr={3}
+              onClick={() => {
+                createGame({
+                  title: gameTitle,
+                }).then(({ data }) => {
+                  setGames([...games, data]);
+                });
+              }}
+            >
+              Create Game
+            </Button>
+            <Input
+              placeholder={"Title"}
+              onChange={(e) => setGameTitle(e.target.value)}
+            />
+          </>
+        )}
+        {!user && <Text>Log in to create a game</Text>}
       </Flex>
       {games
         .filter(
