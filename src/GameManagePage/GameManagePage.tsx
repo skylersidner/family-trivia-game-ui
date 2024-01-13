@@ -21,15 +21,27 @@ const GameManagePage = () => {
         if (answer.isCorrect) {
           for (const player of answer.selectedBy || []) {
             if (!playerMap[player.fullName]) {
-              playerMap[player.fullName] = 1;
+              playerMap[player._id] = {
+                ...playerMap[player._id],
+                score: 1,
+                fullName: player.fullName,
+              };
             } else {
-              playerMap[player.fullName] += 1;
+              playerMap[player._id] = {
+                ...playerMap[player._id],
+                score: (playerMap[player._id].score += 1),
+                fullName: player.fullName,
+              };
             }
           }
         } else {
           for (const player of answer?.selectedBy || []) {
-            if (!playerMap[player.fullName]) {
-              playerMap[player.fullName] = 0;
+            if (!playerMap[player._id]) {
+              playerMap[player._id] = {
+                ...playerMap[player._id],
+                score: 0,
+                fullName: player.fullName,
+              };
             }
           }
         }
@@ -42,9 +54,10 @@ const GameManagePage = () => {
       Current Score
       <Divider height={"4px"} backgroundColor={"blue.400"} />
       {Object.keys(playerMap).map((playerId) => {
+        const player = playerMap[playerId];
         return (
-          <Text>
-            {playerId}: {playerMap[playerId]}
+          <Text key={player._id}>
+            {player.fullName}: {playerMap[playerId].score}
           </Text>
         );
       })}

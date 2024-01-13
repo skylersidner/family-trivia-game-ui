@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Avatar, Box, Button, Divider, Flex, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Flex,
+  Text,
+} from "@chakra-ui/react";
 import Games from "../api/games";
 import "./GamePage.css";
 import { useParams } from "react-router-dom";
@@ -35,6 +43,7 @@ const Question = ({
 }) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string>("");
   const [answerSubmitted, setAnswerSubmitted] = useState<boolean>(false);
+  const [currentAnswerId, setCurrentAnswerId] = useState<any>(null);
   useEffect(() => {
     const currentAnswer = question?.answers.find((answer: any) =>
       answer.selectedBy?.map((user: any) => user._id).includes(user._id)
@@ -42,6 +51,7 @@ const Question = ({
     if (!currentAnswer) return;
     setSelectedAnswerId(currentAnswer?._id);
     setAnswerSubmitted(true);
+    setCurrentAnswerId(currentAnswer?._id);
   }, [question]);
   return (
     <Flex mb={10} mx={3} flexDirection={"column"}>
@@ -53,10 +63,16 @@ const Question = ({
             onClick={() => setSelectedAnswerId(answer._id)}
             cursor={"pointer"}
           >
-            <Text>
-              {`${index + 1}: ${answer.text}`}
-              {selectedAnswerId === answer._id && "✅"}
-            </Text>
+            <Checkbox isChecked={selectedAnswerId === answer._id}>
+              <Box>
+                {answer.text}
+                {currentAnswerId === answer._id && (
+                  <Text color={"blue.400"} display={"inline"}>
+                    - submitted
+                  </Text>
+                )}
+              </Box>
+            </Checkbox>
           </Flex>
         );
       })}
