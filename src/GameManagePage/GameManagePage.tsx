@@ -20,7 +20,7 @@ const GameManagePage = () => {
       for (const answer of answers) {
         if (answer.isCorrect) {
           for (const player of answer.selectedBy || []) {
-            if (!playerMap[player.fullName]) {
+            if (!playerMap[player._id]) {
               playerMap[player._id] = {
                 ...playerMap[player._id],
                 score: 1,
