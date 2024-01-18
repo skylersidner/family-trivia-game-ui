@@ -5,13 +5,17 @@ import "./GameManagePage.css";
 import Games from "../api/games";
 import { useAuth } from "../components/AuthContext";
 import { useParams } from "react-router-dom";
+import axios from "../utils/axios";
+import games from "../api/games";
 
 const GameManagePage = () => {
   const [playerMap, setPlayerMap] = useState<any>({});
   const { gameId } = useParams();
+  const [game, setGame] = useState<any>({});
   useEffect(() => {
     if (!gameId) return;
     Games.getGameById({ gameId }).then(({ data }) => {
+      setGame(data);
       let answers = data?.questions?.map((question: any) => {
         return question.answers;
       });
@@ -52,7 +56,6 @@ const GameManagePage = () => {
   return (
     <Flex direction={"column"} flex={1}>
       Current Score
-      <Divider height={"4px"} backgroundColor={"blue.400"} />
       {Object.keys(playerMap).map((playerId) => {
         const player = playerMap[playerId];
         return (
@@ -61,6 +64,15 @@ const GameManagePage = () => {
           </Text>
         );
       })}
+      <Button
+        onClick={() =>
+          games.updateGame(gameId!, {
+            status: "FINISHED",
+          })
+        }
+      >
+        Finish Game
+      </Button>
     </Flex>
   );
 };

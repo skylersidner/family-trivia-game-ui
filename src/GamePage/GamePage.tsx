@@ -6,6 +6,7 @@ import {
   Checkbox,
   Divider,
   Flex,
+  Icon,
   Text,
 } from "@chakra-ui/react";
 import Games from "../api/games";
@@ -13,6 +14,7 @@ import "./GamePage.css";
 import { useParams } from "react-router-dom";
 import formatDate from "../utils/dates";
 import { useAuth } from "../components/AuthContext";
+import { CheckIcon } from "@chakra-ui/icons";
 
 const ScoreBoard = ({ players }: { players: any[] }) => {
   return (
@@ -64,14 +66,17 @@ const Question = ({
             cursor={"pointer"}
           >
             <Checkbox isChecked={selectedAnswerId === answer._id}>
-              <Box>
+              <Flex alignItems={"center"}>
+                {answer.isCorrect && (
+                  <CheckIcon marginRight={2} color={"green.700"} />
+                )}
                 {answer.text}
                 {currentAnswerId === answer._id && (
                   <Text color={"blue.400"} display={"inline"}>
                     - submitted
                   </Text>
                 )}
-              </Box>
+              </Flex>
             </Checkbox>
           </Flex>
         );
@@ -112,6 +117,7 @@ const GamePage = () => {
   const startDate = new Date(game?.startDate);
   return (
     <Flex direction={"column"} alignItems={"center"}>
+      <Text fontSize={"3xl"}>Game Status: {game?.status}</Text>
       <ScoreBoard players={game?.players || []} />
       <Flex direction={"column"} maxW={"800px"}>
         <Box mx={3}>
