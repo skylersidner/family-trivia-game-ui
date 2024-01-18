@@ -8,6 +8,7 @@ import {
   Flex,
   Icon,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import Games from "../api/games";
 import "./GamePage.css";
@@ -43,6 +44,7 @@ const Question = ({
   user: any;
   setGame: any;
 }) => {
+  const toast = useToast();
   const [selectedAnswerId, setSelectedAnswerId] = useState<string>("");
   const [answerSubmitted, setAnswerSubmitted] = useState<boolean>(false);
   const [currentAnswerId, setCurrentAnswerId] = useState<any>(null);
@@ -81,24 +83,37 @@ const Question = ({
           </Flex>
         );
       })}
-      <Button
-        alignSelf={"center"}
-        width={"100%"}
-        disabled={!selectedAnswerId}
-        maxW={"400px"}
-        textAlign={"center"}
-        onClick={() => {
-          Games.submitAnswer({
-            questionId: question._id,
-            gameId: game._id,
-            answerId: selectedAnswerId,
-          }).then(({ data }) => {
-            setGame(data);
-          });
-        }}
-      >
-        {answerSubmitted ? "Update Answer" : "Submit Answer"}
-      </Button>
+      {game?.status !== "FINISHED" && (
+        <Button
+          alignSelf={"center"}
+          width={"100%"}
+          disabled={!selectedAnswerId}
+          maxW={"400px"}
+          textAlign={"center"}
+          onClick={() => {
+            Games.submitAnswer({
+              questionId: question._id,
+              gameId: game._id,
+              answerId: selectedAnswerId,
+            })
+              .then(({ data }) => {
+                setGame(data);
+              })
+              .catch((err) => {
+                toast({
+                  title: "Error",
+                  description: err.response.data.message,
+                  status: "error",
+                  duration: 9000,
+                  position: "top",
+                  isClosable: true,
+                });
+              });
+          }}
+        >
+          {answerSubmitted ? "Update Answer" : "Submit Answer"}
+        </Button>
+      )}
     </Flex>
   );
 };
