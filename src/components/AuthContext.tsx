@@ -1,21 +1,7 @@
 import React from "react";
 import { jwtDecode } from "jwt-decode";
-import { authenticationService } from "../utils/auth";
-
-export interface IUser {
-  deliveryTimeOptions: any;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  role: string;
-  _id: string;
-  useSwearWords: boolean;
-  fullName: string;
-  messageTypes: string[];
-  pricingTier: string;
-  billingPeriod: string;
-}
+import { authenticationService } from "../services";
+import { IUser } from "../models/users";
 
 interface AuthContextType {
   user: IUser | null;
@@ -33,7 +19,7 @@ const AuthContext = React.createContext<AuthContextType>(null!);
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const storedUser = sessionStorage.getItem("user");
   let [user, setUser] = React.useState<any>(
-      storedUser ? JSON.parse(storedUser) : null
+    storedUser ? JSON.parse(storedUser) : null
   );
 
   const signIn = async (email: string, password: string) => {
@@ -61,4 +47,4 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export default AuthProvider;
 
-export {useAuth};
+export { useAuth };

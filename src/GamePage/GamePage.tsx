@@ -10,7 +10,7 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import Games from "../api/games";
+import { gamesService } from "../services";
 import "./GamePage.css";
 import { useParams } from "react-router-dom";
 import formatDate from "../utils/dates";
@@ -91,11 +91,12 @@ const Question = ({
           maxW={"400px"}
           textAlign={"center"}
           onClick={() => {
-            Games.submitAnswer({
-              questionId: question._id,
-              gameId: game._id,
-              answerId: selectedAnswerId,
-            })
+            gamesService
+              .submitAnswer({
+                questionId: question._id,
+                gameId: game._id,
+                answerId: selectedAnswerId,
+              })
               .then(({ data }) => {
                 setGame(data);
               })
@@ -123,7 +124,7 @@ const GamePage = () => {
   const { gameId } = useParams();
   useEffect(() => {
     if (!gameId) return;
-    Games.getGameById({ gameId }).then(({ data }) => {
+    gamesService.getGameById({ gameId }).then(({ data }) => {
       setGame(data);
     });
   }, []);

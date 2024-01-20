@@ -1,12 +1,13 @@
 import { Button, Flex, Input, Text, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "./GameListPage.css";
-import { getPublicGames, createGame } from "../api/games";
+import { gamesService } from "../services";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { baseURL } from "../utils/axios";
 import { useAuth } from "../components/AuthContext";
 import formatDate from "../utils/dates";
+
 const socket = io(baseURL);
 
 const GameListPage = () => {
@@ -16,7 +17,7 @@ const GameListPage = () => {
   const [gameTitle, setGameTitle] = useState<string>("");
   const [search, setSearch] = useState<string>("");
   useEffect(() => {
-    getPublicGames().then(({ data }) => {
+    gamesService.getPublicGames().then(({ data }) => {
       setGames(data);
     });
   }, []);
@@ -52,11 +53,13 @@ const GameListPage = () => {
               px={8}
               mr={3}
               onClick={() => {
-                createGame({
-                  title: gameTitle,
-                }).then(({ data }) => {
-                  setGames([...games, data]);
-                });
+                gamesService
+                  .createGame({
+                    title: gameTitle,
+                  })
+                  .then(({ data }) => {
+                    setGames([...games, data]);
+                  });
               }}
             >
               Create Game

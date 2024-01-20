@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./components/AuthContext";
 import { IoArrowBack } from "react-icons/io5";
+
 const Banner = () => {
   let auth = useAuth();
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const Banner = () => {
         >
           Games
         </Button>
-        {!!auth.user && (
+        {!!auth?.user && (
           <Popover>
             <PopoverTrigger>
               <div style={{ cursor: "pointer" }}>

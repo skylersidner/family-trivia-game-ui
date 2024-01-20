@@ -1,19 +1,21 @@
 import axios from "../utils/axios";
 
+const basePath = "/api/games";
+
 interface IGameCreate {
   title: string;
 }
 
 export const updateGame = (gameId: string, update: Record<any, any>) => {
-  return axios.patch(`/api/games/${gameId}`, update);
+  return axios.patch(`${basePath}/${gameId}`, update);
 };
 
 export const createGame = (newEvent: IGameCreate) => {
-  return axios.post(`/api/games/create`, newEvent);
+  return axios.post(`${basePath}/create`, newEvent);
 };
 
 export const getGameById = ({ gameId }: { gameId: string }) => {
-  return axios.get(`/api/games/${gameId}`);
+  return axios.get(`${basePath}/${gameId}`);
 };
 
 export const getPublicGames = () => {
@@ -29,15 +31,16 @@ export const submitAnswer = ({
   questionId: string;
   answerId: string;
 }) => {
-  return axios.post(`/api/games/${gameId}/question/${questionId}/answer`, {
+  return axios.post(`${basePath}/${gameId}/question/${questionId}/answer`, {
     answerId,
   });
 };
 
-export default {
+const gamesService = {
   updateGame,
   createGame,
   getGameById,
   getPublicGames,
   submitAnswer,
 };
+export default gamesService;

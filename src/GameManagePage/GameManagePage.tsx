@@ -2,11 +2,10 @@ import { Avatar, Button, Divider, Flex, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import "./GameManagePage.css";
-import Games from "../api/games";
+import { gamesService } from "../services";
 import { useAuth } from "../components/AuthContext";
 import { useParams } from "react-router-dom";
 import axios from "../utils/axios";
-import games from "../api/games";
 
 const GameManagePage = () => {
   const [playerMap, setPlayerMap] = useState<any>({});
@@ -14,7 +13,7 @@ const GameManagePage = () => {
   const [game, setGame] = useState<any>({});
   useEffect(() => {
     if (!gameId) return;
-    Games.getGameById({ gameId }).then(({ data }) => {
+    gamesService.getGameById({ gameId }).then(({ data }) => {
       setGame(data);
       let answers = data?.questions?.map((question: any) => {
         return question.answers;
@@ -66,7 +65,7 @@ const GameManagePage = () => {
       })}
       <Button
         onClick={() =>
-          games.updateGame(gameId!, {
+          gamesService.updateGame(gameId!, {
             status: "FINISHED",
           })
         }

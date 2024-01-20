@@ -13,9 +13,9 @@ import {
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
-import axios from "../utils/axios";
 import { BsPerson } from "react-icons/bs";
 import { MdOutlineEmail, MdOutlineVpnKey } from "react-icons/md";
+import { accountsService } from "../services/index";
 
 const AccountPage = () => {
   let navigate = useNavigate();
@@ -31,16 +31,14 @@ const AccountPage = () => {
   const [password, setPassword] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   function handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     setIsSubmitting(true);
-    if(!user) return;
-    axios
-      .patch(`/api/accounts/${user._id}`, {
-        fullName,
-        email,
-        password,
-      })
+    if (!user) return;
+    const payload = { fullName, email, password };
+    accountsService
+      .updateAccount(user, payload)
       .then(({ data }) => {
         setIsSubmitting(false);
         updateUser(data);
