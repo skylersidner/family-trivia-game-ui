@@ -1,11 +1,8 @@
 import { Avatar, Button, Divider, Flex, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import classNames from "classnames";
 import "./GameManagePage.css";
 import { gamesService } from "../services";
-import { useAuth } from "../components/AuthContext";
 import { useParams } from "react-router-dom";
-import axios from "../utils/axios";
 
 const GameManagePage = () => {
   const [playerMap, setPlayerMap] = useState<any>({});
