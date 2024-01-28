@@ -24,6 +24,8 @@ import formatDate from "../utils/dates";
 import { useAuth } from "../components/AuthContext";
 import { CheckIcon } from "@chakra-ui/icons";
 import { FaExclamation, FaQuestion } from "react-icons/fa";
+import { IQuestion } from "../models/question";
+import { IAnswer } from "../models/answer";
 
 const ScoreBoard = ({ players }: { players: any[] }) => {
   return (
@@ -35,7 +37,7 @@ const ScoreBoard = ({ players }: { players: any[] }) => {
       p={3}
     >
       {players.map((player) => {
-        return <Avatar name={player.name} />;
+        return <Avatar key={player._id} name={player.name} />;
       })}
     </Flex>
   );
@@ -68,11 +70,11 @@ const Question = ({
   return (
     <Flex mb={10} mx={3} flexDirection={"column"}>
       <Text>{question.text}</Text>
-      {question?.answers.map((answer: any, index: number) => {
+      {question?.answers.map((answer: IAnswer) => {
         return (
           <Flex
             key={answer._id}
-            onClick={() => setSelectedAnswerId(answer._id)}
+            onClick={() => setSelectedAnswerId(answer._id || "")}
             cursor={"pointer"}
           >
             <Checkbox isChecked={selectedAnswerId === answer._id}>
@@ -133,33 +135,16 @@ const GamePage = () => {
   const startDate = new Date(game?.startDate);
   useEffect(() => {
     if (!gameId) return;
-    gamesService.getGameById({ gameId }).then(({ data }) => {
-      setGame(data);
-    });
+    getCurrentGame(gameId);
   }, []);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
-  const [isAddingQuestion, setIsAddingQuestion] = useState<any>(false);
-  const [questionText, setQuestionText] = useState<string>("");
-  const [answer1Text, setAnswer1Text] = useState<string>("");
-
   if (!game) return null;
 
-  function addQuestion(): void {
-    const question = {
-      text: questionText,
-      answers: [
-        {
-          text: answer1Text,
-          isCorrect: true,
-        },
-      ],
-    };
-    console.log(question);
-    setIsAddingQuestion(false);
-    // TODO; call AddQuestions...
-    setQuestionText("");
-    setAnswer1Text("");
+  function getCurrentGame(gameId: string) {
+    gamesService.getGameById({ gameId }).then(({ data }) => {
+      setGame(data);
+    });
   }
 
   return (
@@ -177,9 +162,9 @@ const GamePage = () => {
           <Box fontSize={"xl"} textAlign={"center"}>
             Questions
           </Box>
-          {game?.questions.map((question: any) => (
+          {game?.questions.map((question: IQuestion) => (
             <Question
-              key={question.id}
+              key={question._id}
               question={question}
               game={game}
               user={user}
@@ -187,65 +172,6 @@ const GamePage = () => {
             />
           ))}
         </Flex>
-      </Flex>
-      <Flex>
-        {!isAddingQuestion && (
-          <Button
-            ml={2}
-            onClick={(event) => {
-              event.stopPropagation();
-              setIsAddingQuestion(true);
-            }}
-          >
-            Add Question
-          </Button>
-        )}
-
-        {isAddingQuestion && (
-          <VStack spacing={5} bg={"white"} p={10} borderRadius="lg">
-            <FormControl isRequired>
-              <FormLabel>Question Text</FormLabel>
-              <InputGroup>
-                <Textarea
-                  value={questionText}
-                  name="question-text"
-                  resize="vertical"
-                  id={"add-question-form-text"}
-                  placeholder="What is your favorite color?"
-                  onChange={(e) => setQuestionText(e.target.value)}
-                />
-              </InputGroup>
-            </FormControl>
-
-            <FormControl isRequired>
-              <FormLabel>Answer 1</FormLabel>
-              <InputGroup>
-                <Textarea
-                  value={answer1Text}
-                  name="answer1-text"
-                  resize="vertical"
-                  id={"add-question-form-answer-1-text"}
-                  placeholder="Yellow... no green!  Aaaaaah...!"
-                  onChange={(e) => setAnswer1Text(e.target.value)}
-                />
-              </InputGroup>
-            </FormControl>
-
-            <Button
-              colorScheme="blue"
-              bg="blue.400"
-              color="white"
-              _hover={{
-                bg: "blue.500",
-              }}
-              isLoading={false}
-              disabled={false}
-              onClick={(event) => addQuestion()}
-            >
-              Add Question
-            </Button>
-          </VStack>
-        )}
       </Flex>
     </>
   );

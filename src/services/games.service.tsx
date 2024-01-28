@@ -38,12 +38,11 @@ export const submitAnswer = ({
 };
 
 const addQuestions = ({
-  // TODO: Test this...
   gameId,
   questions,
 }: {
-  gameId: string;
-  questions: IQuestion[];
+  gameId: any;
+  questions: any;
 }) => {
   return axios.post(`${basePath}/${gameId}/questions`, {
     questions,
@@ -56,5 +55,6 @@ const gamesService = {
   getGameById,
   getPublicGames,
   submitAnswer,
+  addQuestions,
 };
 export default gamesService;

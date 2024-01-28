@@ -1,11 +1,11 @@
 import { IAnswer } from "./answer";
 
 export interface IQuestion {
-  _id: string;
+  _id?: string;
   test: string;
   answers: IAnswer[];
-  createdBy: string;
-  updatedBy: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
