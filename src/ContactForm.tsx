@@ -22,15 +22,17 @@ import axios from "./utils/axios";
 import { useToast } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import MESSAGE_OPTIONS from "./utils/message.options";
+import { jwtDecode } from "jwt-decode";
+import { useAuth } from "./components/AuthContext";
 
 export default function ContactFormWithSocialButtons() {
-  const { hasCopied, onCopy } = useClipboard("example@example.com");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successfullySignedUp, setSuccessfullySignedUp] = useState(false);
   const toast = useToast();
+  const { updateUser } = useAuth();
 
   return (
     <Flex align="center" justify="center" id="contact-form">
@@ -130,8 +132,13 @@ export default function ContactFormWithSocialButtons() {
                           password,
                         })
                         .then((response) => {
+                          const token = response.data.token;
+                          const user = jwtDecode(token);
+                          sessionStorage.setItem("user", JSON.stringify(user));
+                          sessionStorage.setItem("token", token);
                           setIsSubmitting(false);
                           setSuccessfullySignedUp(true);
+                          updateUser(user);
                           toast({
                             position: "top",
                             title: "Sign up successful.",

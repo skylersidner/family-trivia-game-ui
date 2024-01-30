@@ -133,10 +133,6 @@ const AccountPage = () => {
         >
           Update Account
         </Button>
-        <Text style={{ textAlign: "center" }} color={"gray.500"}>
-          Utilizing this service is not a substitute for a qualified mental
-          health professional
-        </Text>
       </VStack>
     </Box>
   );

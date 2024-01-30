@@ -95,7 +95,7 @@ const GameListPage = () => {
                 } else {
                   toast({
                     title: "You must be logged in to join a game.",
-                    status: "error",
+                    status: "info",
                     duration: 9000,
                     isClosable: true,
                     position: "top",
