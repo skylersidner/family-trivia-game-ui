@@ -49,6 +49,16 @@ const addQuestions = ({
   });
 };
 
+const deleteQuestion = ({
+  gameId,
+  questionId,
+}: {
+  gameId: any;
+  questionId: any;
+}) => {
+  return axios.delete(`${basePath}/${gameId}/question/${questionId}`);
+};
+
 const gamesService = {
   updateGame,
   createGame,
@@ -56,5 +66,6 @@ const gamesService = {
   getPublicGames,
   submitAnswer,
   addQuestions,
+  deleteQuestion,
 };
 export default gamesService;

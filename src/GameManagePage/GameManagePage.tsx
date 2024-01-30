@@ -1,7 +1,5 @@
 import {
-  Avatar,
   Button,
-  Divider,
   Flex,
   FormControl,
   FormLabel,
@@ -14,7 +12,50 @@ import React, { useEffect, useState } from "react";
 import "./GameManagePage.css";
 import { gamesService } from "../services";
 import { useParams } from "react-router-dom";
+import { IAnswer } from "../models/answer";
+import { CheckIcon } from "@chakra-ui/icons";
 
+const Question = ({
+  question,
+  gameId,
+  setGame,
+}: {
+  question: any;
+  gameId: string;
+  setGame: any;
+}) => {
+  return (
+    <Flex mb={10} mx={3} flexDirection={"column"}>
+      <Text>{question.text}</Text>
+      {question?.answers.map((answer: IAnswer) => {
+        return (
+          <Flex key={answer._id}>
+            <Flex alignItems={"center"}>
+              {answer.isCorrect && (
+                <CheckIcon marginRight={2} color={"green.700"} />
+              )}
+              {answer.text}
+            </Flex>
+          </Flex>
+        );
+      })}
+      <Button
+        onClick={() => {
+          gamesService
+            .deleteQuestion({
+              gameId: gameId,
+              questionId: question._id,
+            })
+            .then(({ data }) => {
+              setGame(data);
+            });
+        }}
+      >
+        Delete Question
+      </Button>
+    </Flex>
+  );
+};
 const GameManagePage = () => {
   const [playerMap, setPlayerMap] = useState<any>({});
   const { gameId } = useParams();
@@ -99,6 +140,11 @@ const GameManagePage = () => {
           <Text key={player._id}>
             {player.fullName}: {playerMap[playerId].score}
           </Text>
+        );
+      })}
+      {game?.questions?.map((question: any) => {
+        return (
+          <Question question={question} gameId={gameId!} setGame={setGame} />
         );
       })}
       <Flex>
