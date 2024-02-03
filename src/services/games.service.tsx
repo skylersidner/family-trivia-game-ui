@@ -1,5 +1,4 @@
 import axios from "../utils/axios";
-import { IQuestion } from "../models/question";
 
 const basePath = "/api/games";
 
@@ -26,14 +25,14 @@ export const getPublicGames = () => {
 export const submitAnswer = ({
   gameId,
   questionId,
-  answerId,
+  answerIds,
 }: {
   gameId: string;
   questionId: string;
-  answerId: string;
+  answerIds: string[];
 }) => {
   return axios.post(`${basePath}/${gameId}/question/${questionId}/answer`, {
-    answerId,
+    answerIds,
   });
 };
 

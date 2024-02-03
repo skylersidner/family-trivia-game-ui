@@ -6,24 +6,16 @@ import {
   Checkbox,
   Divider,
   Flex,
-  FormControl,
-  FormLabel,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftElement,
   Text,
-  Textarea,
   useToast,
-  VStack,
 } from "@chakra-ui/react";
+import { pull } from "lodash";
 import { gamesService } from "../services";
 import "./GamePage.css";
 import { useParams } from "react-router-dom";
 import formatDate from "../utils/dates";
 import { useAuth } from "../components/AuthContext";
 import { CheckIcon } from "@chakra-ui/icons";
-import { FaExclamation, FaQuestion } from "react-icons/fa";
 import { IQuestion } from "../models/question";
 import { IAnswer } from "../models/answer";
 
@@ -55,35 +47,53 @@ const Question = ({
   setGame: any;
 }) => {
   const toast = useToast();
-  const [selectedAnswerId, setSelectedAnswerId] = useState<string>("");
+  const [selectedAnswerIds, setSelectedAnswerIds] = useState<string[]>([]);
   const [answerSubmitted, setAnswerSubmitted] = useState<boolean>(false);
-  const [currentAnswerId, setCurrentAnswerId] = useState<any>(null);
+  const [currentAnswerIds, setCurrentAnswerIds] = useState<any>([]);
   useEffect(() => {
-    const currentAnswer = question?.answers.find((answer: any) =>
+    const currentAnswers = question?.answers.filter((answer: any) =>
       answer.selectedBy?.map((user: any) => user._id).includes(user._id)
     );
-    if (!currentAnswer) return;
-    setSelectedAnswerId(currentAnswer?._id);
+    if (!currentAnswers.length) return;
+    setSelectedAnswerIds(currentAnswers.map((answer: any) => answer._id));
     setAnswerSubmitted(true);
-    setCurrentAnswerId(currentAnswer?._id);
+    setCurrentAnswerIds(currentAnswers.map((answer: any) => answer._id));
   }, [question]);
   return (
     <Flex mb={10} mx={3} flexDirection={"column"}>
       <Text>{question.text}</Text>
       {question?.answers.map((answer: IAnswer) => {
+        const answerId = answer._id as string;
         return (
-          <Flex
-            key={answer._id}
-            onClick={() => setSelectedAnswerId(answer._id || "")}
-            cursor={"pointer"}
-          >
-            <Checkbox isChecked={selectedAnswerId === answer._id}>
+          <Flex key={answer._id} cursor={"pointer"}>
+            <Checkbox
+              isChecked={selectedAnswerIds.includes(answer._id!)}
+              onChange={() => {
+                if (question.type === "SELECT_ONE") {
+                  setSelectedAnswerIds([answerId]);
+                  return;
+                }
+                if (question.type === "SELECT_MANY") {
+                  if (selectedAnswerIds.includes(answerId)) {
+                    const updatedAnswerIds = pull(
+                      [...selectedAnswerIds],
+                      answerId
+                    );
+                    setSelectedAnswerIds(updatedAnswerIds);
+                  } else {
+                    const updatedAnswerIds = [...selectedAnswerIds, answerId];
+                    setSelectedAnswerIds(updatedAnswerIds);
+                  }
+                  return;
+                }
+              }}
+            >
               <Flex alignItems={"center"}>
                 {answer.isCorrect && (
                   <CheckIcon marginRight={2} color={"green.700"} />
                 )}
                 {answer.text}
-                {currentAnswerId === answer._id && (
+                {currentAnswerIds.includes(answer._id) && (
                   <Text color={"blue.400"} display={"inline"}>
                     - submitted
                   </Text>
@@ -97,7 +107,7 @@ const Question = ({
         <Button
           alignSelf={"center"}
           width={"100%"}
-          disabled={!selectedAnswerId}
+          disabled={!selectedAnswerIds.length}
           maxW={"400px"}
           textAlign={"center"}
           onClick={() => {
@@ -105,7 +115,7 @@ const Question = ({
               .submitAnswer({
                 questionId: question._id,
                 gameId: game._id,
-                answerId: selectedAnswerId,
+                answerIds: selectedAnswerIds,
               })
               .then(({ data }) => {
                 setGame(data);

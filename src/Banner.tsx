@@ -53,10 +53,7 @@ const Banner = () => {
           <Popover>
             <PopoverTrigger>
               <div style={{ cursor: "pointer" }}>
-                <Avatar
-                  name={auth.user.fullName}
-                  src="https://bit.ly/broken-link"
-                />
+                <Avatar name={auth.user.fullName} />
               </div>
             </PopoverTrigger>
             <PopoverContent w={"200px"}>
