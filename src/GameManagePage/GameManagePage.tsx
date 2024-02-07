@@ -4,6 +4,9 @@ import {
   FormControl,
   FormLabel,
   InputGroup,
+  Radio,
+  RadioGroup,
+  Stack,
   Text,
   Textarea,
   VStack,
@@ -14,6 +17,8 @@ import { gamesService } from "../services";
 import { useParams } from "react-router-dom";
 import { IAnswer } from "../models/answer";
 import { CheckIcon } from "@chakra-ui/icons";
+import { ANSWER_TYPE } from "../models/question";
+import { snakeCaseToSentenceCase } from "../utils/enumHelpers";
 
 const Question = ({
   question,
@@ -103,8 +108,17 @@ const GameManagePage = () => {
   }, []);
 
   const [isAddingQuestion, setIsAddingQuestion] = useState<any>(false);
+  const [answerType, setAnswerType] = useState<ANSWER_TYPE>(
+    ANSWER_TYPE.SELECT_ONE
+  );
   const [addedAnswers, setAddedAnswers] = useState<any>([]);
   const [questionText, setQuestionText] = useState<string>("");
+
+  function setParsedAnswerType(answerTypeString: string) {
+    const parsedAnswerType: ANSWER_TYPE =
+      ANSWER_TYPE[answerTypeString as keyof typeof ANSWER_TYPE];
+    setAnswerType(parsedAnswerType);
+  }
 
   function getCurrentGame(gameId: string) {
     gamesService.getGameById({ gameId }).then(({ data }) => {
@@ -121,6 +135,7 @@ const GameManagePage = () => {
     const question = {
       text: questionText,
       answers: addedAnswers,
+      type: answerType,
     };
     console.log(question);
     gamesService.addQuestions({ gameId, questions: [question] }).then(() => {
@@ -134,11 +149,13 @@ const GameManagePage = () => {
     setAddedAnswers([...addedAnswers, { text: "", isCorrect: false }]);
   }
 
-  function removeAnswer(event: any): void {
-    const index = parseInt(event.target.dataset.index, 10);
-    setAddedAnswers((addedAnswers: any) => {
-      return structuredClone(addedAnswers).splice(index, 1);
-    });
+  function removeAnswer(index: number): void {
+    const filteredAnswers = structuredClone(addedAnswers).filter(
+      (answer: any, idx: number) => {
+        return idx != index;
+      }
+    );
+    setAddedAnswers(filteredAnswers);
   }
 
   function setAddedAnswerText(text: string, index: number): void {
@@ -198,6 +215,27 @@ const GameManagePage = () => {
                 />
               </InputGroup>
             </FormControl>
+            <FormControl>
+              <FormLabel>Answer Type</FormLabel>
+              <InputGroup>
+                <RadioGroup
+                  onChange={(type) => setParsedAnswerType(type)}
+                  value={answerType}
+                >
+                  <Stack direction="row" spacing={4}>
+                    <Radio value={ANSWER_TYPE.SELECT_ONE}>
+                      {snakeCaseToSentenceCase(ANSWER_TYPE.SELECT_ONE)}
+                    </Radio>
+                    <Radio value={ANSWER_TYPE.SELECT_MANY}>
+                      {snakeCaseToSentenceCase(ANSWER_TYPE.SELECT_MANY)}
+                    </Radio>
+                    <Radio value={ANSWER_TYPE.FREE_FORM}>
+                      {snakeCaseToSentenceCase(ANSWER_TYPE.FREE_FORM)}
+                    </Radio>
+                  </Stack>
+                </RadioGroup>
+              </InputGroup>
+            </FormControl>
             {addedAnswers.map((answer: IAnswer, idx: number) => (
               <FormControl isRequired key={idx}>
                 <FormLabel>Answer {idx + 1}</FormLabel>
@@ -221,7 +259,7 @@ const GameManagePage = () => {
                   }}
                   isLoading={false}
                   disabled={false}
-                  onClick={(e) => removeAnswer(e)}
+                  onClick={(_) => removeAnswer(idx)}
                 >
                   Remove Answer
                 </Button>
