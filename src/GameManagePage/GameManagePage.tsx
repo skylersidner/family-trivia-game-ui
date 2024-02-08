@@ -188,7 +188,7 @@ const GameManagePage = () => {
             if (!playerMap[player._id]) {
               playerMap[player._id] = {
                 ...playerMap[player._id],
-                score: 1,
+                score: answer.points,
                 fullName: player.fullName,
               };
             } else {
@@ -205,6 +205,12 @@ const GameManagePage = () => {
               playerMap[player._id] = {
                 ...playerMap[player._id],
                 score: 0,
+                fullName: player.fullName,
+              };
+            } else {
+              playerMap[player._id] = {
+                ...playerMap[player._id],
+                score: (playerMap[player._id].score || 0) + answer.points,
                 fullName: player.fullName,
               };
             }
