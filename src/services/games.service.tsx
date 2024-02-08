@@ -1,4 +1,5 @@
 import axios from "../utils/axios";
+import { IQuestion } from "../models/question";
 
 const basePath = "/api/games";
 
@@ -48,6 +49,20 @@ const addQuestions = ({
   });
 };
 
+export const updateQuestion = ({
+  gameId,
+  questionId,
+  question,
+}: {
+  gameId: string;
+  questionId: string;
+  question: any;
+}) => {
+  return axios.patch(`${basePath}/${gameId}/question/${questionId}`, {
+    question,
+  });
+};
+
 const deleteQuestion = ({
   gameId,
   questionId,
@@ -65,6 +80,7 @@ const gamesService = {
   getPublicGames,
   submitAnswer,
   addQuestions,
+  updateQuestion,
   deleteQuestion,
 };
 export default gamesService;

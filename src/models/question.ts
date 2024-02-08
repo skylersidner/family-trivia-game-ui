@@ -1,4 +1,5 @@
 import { IAnswer } from "./answer";
+import { IUser } from "./users";
 
 export interface IQuestion {
   _id?: string;
@@ -9,6 +10,7 @@ export interface IQuestion {
   createdAt?: Date;
   updatedAt?: Date;
   type?: ANSWER_TYPE;
+  winners?: IUser[];
 }
 
 export enum ANSWER_TYPE {
