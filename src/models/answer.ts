@@ -9,4 +9,5 @@ export interface IAnswer {
   selectedBy?: IUser[];
   createdAt?: Date;
   updatedAt?: Date;
+  winners?: IUser[];
 }

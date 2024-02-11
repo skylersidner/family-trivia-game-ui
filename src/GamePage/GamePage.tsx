@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -16,8 +16,10 @@ import { useParams } from "react-router-dom";
 import formatDate from "../utils/dates";
 import { useAuth } from "../components/AuthContext";
 import { CheckIcon } from "@chakra-ui/icons";
-import { IQuestion } from "../models/question";
+import { ANSWER_TYPE, IQuestion } from "../models/question";
 import { IAnswer } from "../models/answer";
+import { IUser } from "../models/users";
+import { PiShootingStarBold } from "react-icons/pi";
 
 const ScoreBoard = ({ players }: { players: any[] }) => {
   return (
@@ -50,6 +52,45 @@ const Question = ({
   const [selectedAnswerIds, setSelectedAnswerIds] = useState<string[]>([]);
   const [answerSubmitted, setAnswerSubmitted] = useState<boolean>(false);
   const [currentAnswerIds, setCurrentAnswerIds] = useState<any>([]);
+  const [winners, setWinners] = useState<IUser[]>([]);
+  const [userIsWinner, setUserIsWinner] = useState<boolean>(false);
+  const [score, setScore] = useState<any>({ correct: 0, incorrect: 0 });
+
+  const goldStarStyle = { color: "gold", fontSize: "1.5em" };
+
+  const getCurrentWinners = useCallback(() => {
+    if (question.type == ANSWER_TYPE.SELECT_ONE) {
+      return question.answers?.find((answer: IAnswer) => answer.isCorrect)
+        ?.winners;
+    }
+    return [];
+  }, [question]);
+
+  const setCurrentUserIsWinner = useCallback(() => {
+    if (question.type == ANSWER_TYPE.SELECT_ONE) {
+      const allWinners = question.answers?.find(
+        (answer: IAnswer) => answer.isCorrect
+      )?.winners;
+      if (allWinners?.find((w: IUser) => w._id == user._id)) {
+        setUserIsWinner(true);
+      }
+    }
+    return [];
+  }, [user, question]);
+
+  const setSelectManyScore = () => {
+    const newScore = { correct: 0, incorrect: 0 };
+    newScore.correct = question.answers.filter(
+      (a: IAnswer) =>
+        a.isCorrect && a.selectedBy?.find((u: IUser) => u._id == user._id)
+    ).length;
+    newScore.incorrect = question.answers.filter(
+      (a: IAnswer) =>
+        !a.isCorrect && a.selectedBy?.find((u: IUser) => u._id == user._id)
+    ).length;
+    setScore(newScore);
+  };
+
   useEffect(() => {
     const currentAnswers = question?.answers.filter((answer: any) =>
       answer.selectedBy?.map((user: any) => user._id).includes(user._id)
@@ -58,6 +99,9 @@ const Question = ({
     setSelectedAnswerIds(currentAnswers.map((answer: any) => answer._id));
     setAnswerSubmitted(true);
     setCurrentAnswerIds(currentAnswers.map((answer: any) => answer._id));
+    setWinners(getCurrentWinners());
+    setCurrentUserIsWinner();
+    setSelectManyScore();
   }, [question]);
   return (
     <Flex mb={10} mx={3} flexDirection={"column"}>
@@ -103,6 +147,19 @@ const Question = ({
           </Flex>
         );
       })}
+      {question.type === "SELECT_MANY" && (
+        <Flex flexDirection={"column"}>
+          <Text>Correct: {score.correct}</Text>
+          <Text>Incorrect: {score.incorrect}</Text>
+          <Text>Total: {score.correct - score.incorrect}</Text>
+        </Flex>
+      )}
+      {!!winners?.length && (
+        <Flex>
+          {userIsWinner && <PiShootingStarBold style={goldStarStyle} />}&nbsp;
+          <Text>Winners: {winners.map((w) => w.fullName).join(", ")}</Text>
+        </Flex>
+      )}
       {game?.status !== "FINISHED" && (
         <Button
           alignSelf={"center"}
@@ -110,6 +167,7 @@ const Question = ({
           disabled={!selectedAnswerIds.length}
           maxW={"400px"}
           textAlign={"center"}
+          mt={2}
           onClick={() => {
             gamesService
               .submitAnswer({

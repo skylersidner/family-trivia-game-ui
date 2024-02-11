@@ -63,6 +63,25 @@ export const updateQuestion = ({
   });
 };
 
+export const updateAnswer = ({
+  gameId,
+  questionId,
+  answerId,
+  answer,
+}: {
+  gameId: string;
+  questionId: string;
+  answerId: string;
+  answer: any;
+}) => {
+  return axios.patch(
+    `${basePath}/${gameId}/question/${questionId}/answer/${answerId}`,
+    {
+      answer,
+    }
+  );
+};
+
 const deleteQuestion = ({
   gameId,
   questionId,
@@ -81,6 +100,7 @@ const gamesService = {
   submitAnswer,
   addQuestions,
   updateQuestion,
+  updateAnswer,
   deleteQuestion,
 };
 export default gamesService;

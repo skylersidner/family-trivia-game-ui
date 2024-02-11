@@ -25,6 +25,7 @@ import { snakeCaseToSentenceCase } from "../utils/enumHelpers";
 import { sample } from "lodash";
 import { IUser } from "../models/users";
 import { updateQuestion } from "../services/games.service";
+import QuestionForm from "../QuestionForm/QuestionForm";
 
 const Question = ({
   question,
@@ -45,11 +46,16 @@ const Question = ({
     return null;
   }, [question]);
 
+  const getCorrectAnswer = useCallback(() => {
+    return question.answers?.find((answer: IAnswer) => answer.isCorrect);
+  }, [question]);
+
   const [winners, setWinners] = useState<IUser[]>(getCurrentWinners());
   const [isChoosingWinners, setIsChoosingWinners] = useState<boolean>(false);
   const [currentRandomWinner, setCurrentRandomWinner] = useState<IUser | null>(
     null
   );
+  const [isEditingQuestion, setIsEditingQuestion] = useState<boolean>(false);
 
   const hasCorrectSubmissions = useCallback(() => {
     return question.answers?.reduce(
@@ -64,9 +70,7 @@ const Question = ({
   }, [question]);
 
   function chooseAndSetOneRandomWinner(): void {
-    const correctAnswer = question.answers?.find(
-      (answer: IAnswer) => answer.isCorrect
-    );
+    const correctAnswer = getCorrectAnswer();
     let randomWinner = null;
     if (correctAnswer) {
       const hasOneSelectedBy = correctAnswer.selectedBy.length == 1;
@@ -82,13 +86,15 @@ const Question = ({
   }
 
   function saveRandomWinner(): void {
-    if (currentRandomWinner) {
-      gamesService.updateQuestion({
+    const correctAnswer = getCorrectAnswer();
+    if (currentRandomWinner && correctAnswer) {
+      gamesService.updateAnswer({
         gameId,
         questionId: question._id,
-        question: {
-          _id: question._id,
-          winners: [currentRandomWinner._id],
+        answerId: correctAnswer._id,
+        answer: {
+          _id: correctAnswer._id,
+          winners: [{ _id: currentRandomWinner._id }],
         },
       });
     }
@@ -115,10 +121,15 @@ const Question = ({
                 </Text>
               )}
             </Flex>
-            {!!winners?.length && <Text>Winners: {winners.join(", ")}</Text>}
           </Flex>
         );
       })}
+      <Flex mt={4}>
+        {!!winners?.length && (
+          <Text>Winners: {winners.map((w) => w.fullName).join(", ")}</Text>
+        )}
+        {!winners?.length && <Text as="i">No winners yet...</Text>}
+      </Flex>
       {hasCorrectSubmissions() && question?.type == ANSWER_TYPE.SELECT_ONE && (
         <Flex>
           <Button
@@ -166,6 +177,19 @@ const Question = ({
           Delete Question
         </Button>
       </Flex>
+      <Flex>
+        <Button
+          m={2}
+          onClick={() => {
+            setIsEditingQuestion(true);
+          }}
+        >
+          Edit Question
+        </Button>
+      </Flex>
+      {isEditingQuestion && (
+        <QuestionForm question={question} gameId={gameId} getGame={() => {}} />
+      )}
     </Flex>
   );
 };
