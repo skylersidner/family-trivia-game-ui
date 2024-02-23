@@ -24,7 +24,6 @@ import { ANSWER_TYPE, IQuestion } from "../models/question";
 import { snakeCaseToSentenceCase } from "../utils/enumHelpers";
 import { sample } from "lodash";
 import { IUser } from "../models/users";
-import { updateQuestion } from "../services/games.service";
 import QuestionForm from "../QuestionForm/QuestionForm";
 
 const Question = ({
@@ -32,25 +31,31 @@ const Question = ({
   gameId,
   setGame,
   isShowingSelectedBy = false,
+  initializeGameData = () => {},
 }: {
-  question: any;
+  question: IQuestion;
   gameId: string;
   setGame: any;
   isShowingSelectedBy: boolean;
+  initializeGameData: any;
 }) => {
   const getCurrentWinners = useCallback(() => {
     if (question.type == ANSWER_TYPE.SELECT_ONE) {
-      return question.answers?.find((answer: IAnswer) => answer.isCorrect)
-        ?.winners;
+      const foundWinners =
+        question.answers?.find((answer: IAnswer) => answer.isCorrect)
+          ?.winners || null;
+
+      return foundWinners;
     }
-    return null;
   }, [question]);
 
   const getCorrectAnswer = useCallback(() => {
     return question.answers?.find((answer: IAnswer) => answer.isCorrect);
   }, [question]);
 
-  const [winners, setWinners] = useState<IUser[]>(getCurrentWinners());
+  const [winners, setWinners] = useState<IUser[] | null>(
+    getCurrentWinners() || null
+  );
   const [isChoosingWinners, setIsChoosingWinners] = useState<boolean>(false);
   const [currentRandomWinner, setCurrentRandomWinner] = useState<IUser | null>(
     null
@@ -73,31 +78,37 @@ const Question = ({
     const correctAnswer = getCorrectAnswer();
     let randomWinner = null;
     if (correctAnswer) {
-      const hasOneSelectedBy = correctAnswer.selectedBy.length == 1;
-      const hasMoreThanOneSelectedBy = correctAnswer.selectedBy.length > 1;
+      const hasOneSelectedBy = correctAnswer.selectedBy?.length == 1;
+      const hasMoreThanOneSelectedBy =
+        (correctAnswer.selectedBy?.length || 0) > 1;
       if (hasOneSelectedBy) {
-        randomWinner = correctAnswer.selectedBy[0];
+        randomWinner = correctAnswer.selectedBy?.[0] || null;
       } else if (hasMoreThanOneSelectedBy) {
-        randomWinner = sample(correctAnswer.selectedBy);
+        randomWinner = sample(correctAnswer.selectedBy) || null;
       }
     }
 
     setCurrentRandomWinner(randomWinner);
   }
 
-  function saveRandomWinner(): void {
+  function calculateHalftime(): any {}
+
+  async function saveRandomWinner(): Promise<any> {
     const correctAnswer = getCorrectAnswer();
     if (currentRandomWinner && correctAnswer) {
-      gamesService.updateAnswer({
+      await gamesService.updateAnswer({
         gameId,
-        questionId: question._id,
-        answerId: correctAnswer._id,
+        questionId: question._id || "",
+        answerId: correctAnswer._id || "",
         answer: {
           _id: correctAnswer._id,
           winners: [{ _id: currentRandomWinner._id }],
         },
       });
+      await initializeGameData(gameId);
     }
+
+    // TODO: saving the winner isn't updating the view...
     setIsChoosingWinners(false);
   }
 
@@ -197,9 +208,9 @@ const GameManagePage = () => {
   const [playerMap, setPlayerMap] = useState<any>({});
   const { gameId } = useParams();
   const [game, setGame] = useState<any>({});
-  useEffect(() => {
-    if (!gameId) return;
-    gamesService.getGameById({ gameId }).then(({ data }) => {
+
+  function initializeGameData(): any {
+    gamesService.getGameById({ gameId: gameId! }).then(({ data }) => {
       setGame(data);
       let answers = data?.questions?.map((question: any) => {
         return question.answers;
@@ -243,7 +254,12 @@ const GameManagePage = () => {
       }
       setPlayerMap(playerMap);
     });
-  }, []);
+  }
+
+  useEffect(() => {
+    if (!gameId) return;
+    initializeGameData();
+  }, [gameId]);
 
   const [isShowingSelectedBy, setIsShowingSelectedby] =
     useState<boolean>(false);
@@ -260,10 +276,8 @@ const GameManagePage = () => {
     setAnswerType(parsedAnswerType);
   }
 
-  function getCurrentGame(gameId: string) {
-    gamesService.getGameById({ gameId }).then(({ data }) => {
-      setGame(data);
-    });
+  function getCurrentGame() {
+    initializeGameData();
   }
 
   function addQuestion(): void {
@@ -279,7 +293,7 @@ const GameManagePage = () => {
     };
     console.log(question);
     gamesService.addQuestions({ gameId, questions: [question] }).then(() => {
-      getCurrentGame(gameId || "");
+      getCurrentGame();
     });
     setIsAddingQuestion(false);
     setQuestionText("");
@@ -332,6 +346,7 @@ const GameManagePage = () => {
               gameId={gameId!}
               setGame={setGame}
               isShowingSelectedBy={isShowingSelectedBy}
+              initializeGameData={() => getCurrentGame()}
             />
           );
         })}
